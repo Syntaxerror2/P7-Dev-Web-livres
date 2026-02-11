@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt')
 const User = require('../models/User')
+//On importe le package permettant de vérifier des tokens
+const jwt = require('jsonwebtoken');
 
 
 exports.signup = (req, res, next) => {
@@ -25,7 +27,7 @@ exports.login = (req, res, next) => {
   User.findOne({email: req.body.email})
   .then(user => {
     if(user === null) {
-        res.status(401).json({message: 'Paire identifiant/mot de passe incorrecte'})
+    return res.status(401).json({message: 'Paire identifiant/mot de passe incorrecte'})
     } else {
 //La méthode compare va comparer ce qui est entré et ce qui est stocké en bdd
         bcrypt.compare(req.body.password, user.password)
@@ -35,7 +37,13 @@ exports.login = (req, res, next) => {
             } else {
                 res.status(200).json({
                     userId: user._id,
-                    token: 'TOKEN'
+                    token: jwt.sign(
+                    {userId: user._id},
+                    'RANDOM_TOKEN_SECRET',
+                    {expiresIn: '24h'}
+                    )
+//On appelle la fonction sign() de jwt
+//arguments : payload, clé d'encodage, délai avant expiration
                 })
             }
         })
