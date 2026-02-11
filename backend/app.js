@@ -2,22 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
+
 /*
-mongoose.connect(
-  //'mongodb+srv://syntaxerror1:mongo6785@cluster1.5iezpx7.mongodb.net/books?appName=Cluster1'
-  'mongodb+srv://syntaxerror1:mongo12345@cluster1.5iezpx7.mongodb.net/?appName=Cluster1'
-)
+mongoose.connect('mongodb+srv://syntaxicodeux:mongolie@cluster1.5iezpx7.mongodb.net/?appName=Cluster1')
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(err => console.error(err));
-
 */
 
-mongoose
-  .connect(
-    "mongodb+srv://niolwebshop:yhxXNcIYZ7vX8F7z@p7.rjb8efq.mongodb.net/?appName=test"
-  )
-  .then(() => console.log("Connexion à MongoDB réussie !"))
-  .catch((err) => {console.error(err)}, console.log("Connexion à MongoDB échouée !"));
+//Connecté en dur en attendant mieux
+mongoose.connect('mongodb://127.0.0.1:27017/livres')
+  .then(() => console.log('Connexion MongoDB locale réussie !'))
+  .catch(err => console.error(err));
 
 
 
@@ -33,10 +28,10 @@ app.use((req, res, next) => {
 
 app.post('/api/books', (req, res, next) => {
   console.log(req.body);
+  //Si on envoie pas de réponse, la requète plante côté utilisateur
   res.status(201).json({
     message: 'Objet créé !'
   });
-  next();
 });
 
 app.get('/api/books', (req, res, next) => {
@@ -61,7 +56,6 @@ app.get('/api/books', (req, res, next) => {
   res.status(200).json(stuff);
 });
 
-//modules zerzerzerzr
 
 
 module.exports = app;
