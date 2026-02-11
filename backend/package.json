@@ -11,8 +11,8 @@
   "dependencies": {
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.1.5"
+    "mongoose": "^9.1.5",
+    "mongoose-unique-validator": "^5.0.2"
   },
-  "devDependencies": {},
   "description": ""
 }
