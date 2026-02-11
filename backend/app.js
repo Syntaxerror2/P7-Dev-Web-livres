@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 //On importe le router
 const booksRoute = require('./routes/books')
 
-//const { TopologyDescriptionChangedEvent } = require('mongodb');
+const userRoute = require('./routes/user')
 
 
 
@@ -35,5 +35,6 @@ app.use((req, res, next) => {
 
 
 app.use('/api/books', booksRoute);
+app.use('/api/auth', userRoute)
 
 module.exports = app;
