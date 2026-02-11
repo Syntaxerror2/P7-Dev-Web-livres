@@ -2,10 +2,6 @@ const mongoose = require('mongoose');
 
 //fonction schema, mise à disposition par mongoose
 //permet de passer un objet
-const userSchema = mongoose.Schema({
-    email: {type: String, required: true},
-    password: {type: String, required: true}
-})
 const bookSchema = mongoose.Schema({
     userId: {type : String, required: true},
     title: {type: String, required: true},
@@ -25,5 +21,4 @@ const bookSchema = mongoose.Schema({
 //Seconde méthode du package mongoose : mongoose.Model
 //Permet d'exploiter les schémas
 //Premier argument : nom du schéma ; Deuxième : la const associée
-module.export = mongoose.model('Book', bookSchema);
-module.export = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Book', bookSchema);

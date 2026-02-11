@@ -1,8 +1,7 @@
 const express = require('express');
-const bodyParser =  require('body-parser');
 const mongoose = require('mongoose');
 
-const Book = require('../backend/models/Book');
+const Book = require('./models/Book');
 
 
 
@@ -29,7 +28,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.json());
 
 app.post('/api/books', (req, res, next) => {
 //Pour le moment, l'ID renvoyée est générée automatiquement, donc on la delete
@@ -40,7 +38,7 @@ const book = new Book({
 });
 //Méthode save nous permet d'enregistrer dans la base
 book.save()
-.then(res => res.status(201).json({message: 'Objet enregistré'}))
+.then(() => res.status(201).json({message: 'Objet enregistré'}))
 .catch(error => res.status(400).json({error}));
 });
 
@@ -82,6 +80,14 @@ app.get('/api/books', (req, res, next) => {
   res.status(200).json(stuff);
 });
 
+//Version non-statique : 
+/*
+app.get('/api/books', (req, res, next) => {
+  Book.find()
+    .then(books => res.status(200).json(books))
+    .catch(error => res.status(400).json({ error }));
+}); 
+*/
 
 
 module.exports = app;
