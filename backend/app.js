@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+
 //On importe le router
 const booksRoute = require('./routes/books')
 
@@ -23,6 +24,8 @@ const app = express();
 
 
 app.use(express.json());
+
+app.use('/images', express.static('images'));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

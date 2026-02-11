@@ -1,5 +1,6 @@
 const Book = require('../models/Book');
 
+/* Ancien createBook (avant Multer)
 exports.createBook = 
 //POST d'un nouveau Book //Méthode save 
 (req, res, next) => {
@@ -12,7 +13,22 @@ const book = new Book({
 book.save()
 .then(() => res.status(201).json({message: 'Objet enregistré'}))
 .catch(error => res.status(400).json({error}));
+}; */
+
+exports.createBook = (req, res, next) => {
+  const bookObject = JSON.parse(req.body.book);
+  delete bookObject._id;
+
+  const book = new Book({
+    ...bookObject,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  });
+
+  book.save()
+    .then(() => res.status(201).json({ message: 'Objet enregistré' }))
+    .catch(error => res.status(400).json({ error }));
 };
+
 
 //PUT modifiant un objet existant //Méthode updateOne
 exports.modifyBook = 
