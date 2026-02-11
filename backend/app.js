@@ -66,8 +66,8 @@ app.put('/api/books/:id', (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 });
 
-//DELETE un objet existant //Méthode updateOne
-app.delete('/api/stuff/:id', (req, res, next) => {
+//DELETE un objet existant //Méthode deleteOne
+app.delete('/api/book/:id', (req, res, next) => {
   Book.deleteOne({ _id: req.params.id })
     .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
     .catch(error => res.status(400).json({ error }));
