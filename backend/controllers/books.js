@@ -17,6 +17,7 @@ book.save()
 
 exports.createBook = (req, res, next) => {
   const bookObject = JSON.parse(req.body.book);
+  console.log(bookObject)
   delete bookObject._id;
 
   const book = new Book({
