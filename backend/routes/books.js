@@ -14,10 +14,10 @@ router.post('/', auth, multer, bookCtrl.createBook);
 router.put('/:id', auth, bookCtrl.modifyBook);
 
 //GET d'un seul Book //Méthode findOne
-router.get('/:id', auth, bookCtrl.findOneBook);
+router.get('/:id', bookCtrl.findOneBook);
   
 //GET des Book enregistrés //Méthode find
-router.get('/', auth, bookCtrl.findBook);
+router.get('/', bookCtrl.findBook);
 
 //DELETE un objet existant //Méthode deleteOne
 router.delete('/:id', auth, bookCtrl.deleteBook);

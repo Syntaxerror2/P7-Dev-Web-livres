@@ -5,14 +5,20 @@ const fs = require('fs');
 //Bien revoir la section "Modifiez les routes prendre en compte les fichiers"
 
 exports.createBook = (req, res, next) => {
- const bookObject = JSON.parse(req.body.thing)
+console.log(req.file);
+console.log(req.body);
+ //const bookObject = JSON.parse(req.body.thing)
+const bookObject = req.body.book ? JSON.parse(req.body.book) : req.body;
+
  delete bookObject._id; //ID générée automatiquement par bdd donc delete
  delete bookObject._userId; //On utilise le userId venant du token d'auth
 //Ainsi, personne ne peut utiliser le userId de quelqu'un d'autre
 const book = new Book({
   ...bookObject,
   userId: req.auth.userId,
-  imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+  imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+  ratings: [],
+  averageRating: 0
   //On génère nous-même l'URL via le nom de fichier donné par Multer
 });
 book.save()
