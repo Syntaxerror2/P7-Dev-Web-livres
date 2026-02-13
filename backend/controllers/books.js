@@ -17,8 +17,8 @@ const book = new Book({
   ...bookObject,
   userId: req.auth.userId,
   imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-  ratings: [],
-  averageRating: 0
+  ratings: bookObject.ratings || [],
+  averageRating: bookObject.averageRating || 0
   //On génère nous-même l'URL via le nom de fichier donné par Multer
 });
 book.save()
