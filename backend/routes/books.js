@@ -9,6 +9,7 @@ const multer = require('../middleware/multer-config');
 router.post('/', auth, multer, bookCtrl.createBook);
 //On récupère le token, et ensuite seulement on ajoute multer
 //Afin de vérifier les images
+router.post('/:id/rating', auth, bookCtrl.rateBook);
 
 //PUT modifiant un objet existant //Méthode updateOne
 router.put('/:id', auth, bookCtrl.modifyBook);

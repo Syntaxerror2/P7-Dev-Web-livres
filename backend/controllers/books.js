@@ -17,7 +17,7 @@ const book = new Book({
   ...bookObject,
   userId: req.auth.userId,
   imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-  ratings: bookObject.ratings || [],
+  ratings: bookObject.ratings,
   averageRating: bookObject.averageRating || 0
   //On génère nous-même l'URL via le nom de fichier donné par Multer
 });
@@ -92,3 +92,43 @@ Book.deleteOne({_id: req.params.id})
   res.status(500).json({error});
 })
 };
+
+//POST de notation des livres
+exports.rateBook = (req, res, next) => {
+  const userId = req.auth.userId;
+  const rating = req.body.rating;
+if(rating < 0 || rating > 5) {
+  return res.status(400).json({
+    message : "Votre note doit être comprise en 0 et 5"
+  });
+}
+
+  Book.findOne({_id: req.params.id})
+  .then(book => {
+//On vérifie si l'utilisateur a déjà noté
+  const alreadyRated = book.ratings.find(
+    rating => rating.userId === userId
+  );
+  if(alreadyRated) {
+    return res.status(400).json({
+      message: "Vous avez déjà noté ce livre"
+    });
+  }
+//On ajoute la note
+  book.ratings.push({userId, grade: rating});
+//On recalcule la moyenne en incrémentant la nouvelle note
+const total = book.ratings.reduce(
+  (sum, rating) => sum + rating.grade, 0
+);
+//On divise le total par le nombre de notes uniques
+book.averageRating = total/book.ratings.length
+return book.save();
+  })
+.then(updateBook => res.status(200).json(updateBook))
+.catch(error => res.status(400).json({error}));
+}
+
+//Tout marche à une exception près :
+//La note donnée à la création d'un nouveau livre s'affiche MAIS
+//l'utilisateur peut modifier sa note quand il va sur la page du livre
+//Une fois qu'il l'a modifié, il ne peut en revanche plus la modifier à nouveau (comportement attendu)
