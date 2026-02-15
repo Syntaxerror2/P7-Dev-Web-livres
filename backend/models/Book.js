@@ -15,8 +15,11 @@ const bookSchema = mongoose.Schema({
             grade: {type: Number, required: true}
         }
     ],
-    averageRating: {type: Number, required: true}
+    averageRating: {type: Number}
 })
+
+//Note : retiré le required de averageRating, à voir si cela ne cause pas de bug
+
 
 //Seconde méthode du package mongoose : mongoose.Model
 //Permet d'exploiter les schémas

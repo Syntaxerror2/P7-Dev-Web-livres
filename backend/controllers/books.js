@@ -1,30 +1,51 @@
 const Book = require('../models/Book');
+const sharp = require('sharp');
+const path = require('path');
 //signifie « file system » (soit « système de fichiers », en français)
 //Il donne accès aux fonctions qui permettent de modifier le système de fichiers
 const fs = require('fs');
 //Bien revoir la section "Modifiez les routes prendre en compte les fichiers"
 
-exports.createBook = (req, res, next) => {
+exports.createBook = async (req, res, next) => {
 console.log(req.file);
 console.log(req.body);
- //const bookObject = JSON.parse(req.body.thing)
+//const bookObject = JSON.parse(req.body.thing)
 const bookObject = req.body.book ? JSON.parse(req.body.book) : req.body;
 
  delete bookObject._id; //ID générée automatiquement par bdd donc delete
  delete bookObject._userId; //On utilise le userId venant du token d'auth
 //Ainsi, personne ne peut utiliser le userId de quelqu'un d'autre
+
+ try {
+
+//Nouveau nom du fichier avec extension webp
+const filename = Date.now() + '.webp';
+const imagePath = path.join('images', filename);
+
+//Traitement de l'image avec Sharp
+await sharp(req.file.buffer)
+  .resize(500)
+  .webp({ quality: 80 })
+  .toFile(imagePath);
+
 const book = new Book({
   ...bookObject,
   userId: req.auth.userId,
-  imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+  imageUrl: `${req.protocol}://${req.get('host')}/images/${filename}`,
   ratings: bookObject.ratings,
   averageRating: bookObject.averageRating || 0
-  //On génère nous-même l'URL via le nom de fichier donné par Multer
+  //On génère nous-même l'URL via le nom de fichier donné par Sharp
 });
-book.save()
-.then(() => {res.status(201).json({message: 'Objet enregistré'})})
-.catch(error => {res.status(400).json({error})})
+
+await book.save();
+
+res.status(201).json({message: 'Objet enregistré'});
+
+} catch(error) {
+  res.status(400).json({error});
+}
 };
+
 
 exports.modifyBook = (req, res, next) => {
 //PUT modifiant un objet existant //Méthode updateOne
@@ -128,7 +149,6 @@ return book.save();
 .catch(error => res.status(400).json({error}));
 }
 
-//Tout marche à une exception près :
-//La note donnée à la création d'un nouveau livre s'affiche MAIS
-//l'utilisateur peut modifier sa note quand il va sur la page du livre
-//Une fois qu'il l'a modifié, il ne peut en revanche plus la modifier à nouveau (comportement attendu)
+// à faire > /api/books/bestrating 
+// à faire > tester chacune des exigences fonctionnelles
+// à faire > Sharp > Images optimisées
