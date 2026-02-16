@@ -6,13 +6,16 @@ const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config');
 
 //POST un nouvel objet
-router.post('/', auth, multer, bookCtrl.createBook);
-//On récupère le token, et ensuite seulement on ajoute multer
-//Afin de vérifier les images
+router.post('/', auth, multer, bookCtrl.createBook); //On récupère le token, ensuite seulement on ajoute multer
+
+//POST Afin de vérifier les images
 router.post('/:id/rating', auth, bookCtrl.rateBook);
 
 //PUT modifiant un objet existant //Méthode updateOne
 router.put('/:id', auth, bookCtrl.modifyBook);
+
+//GET des 3 livres les mieux notés
+router.get('/bestrating', bookCtrl.bestRating)
 
 //GET d'un seul Book //Méthode findOne
 router.get('/:id', bookCtrl.findOneBook);

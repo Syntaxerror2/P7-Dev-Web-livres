@@ -65,7 +65,7 @@ Book.findOne({_id: req.params.id})
 //C'est que quelqu'un essaie de modifie un objet qui ne lui appartient pas
 //On renvoie donc une erreur 400
   if(thing.userId !== req.auth.userId ) {
-  return  res.status(401).json({message: "Non-autorisé"})
+  return  res.status(403).json({message: "Non-autorisé"})
   } else {
 //Filtre indiquant quel est l'enregistrement à mettre à jour
 //Et avec quel objet : celui récupéré dans le corps de la fonction
@@ -105,7 +105,7 @@ if(book.userId !== req.auth.userId) {
 fs.unlink(`images/${fileName}`, () => {
 Book.deleteOne({_id: req.params.id})
 .then(() => {res.status(200).json({message: 'objet supprimé'})})
-.catch(error => res.status(401).json({error}));
+.catch(error => res.status(403).json({error}));
 })
 }
 })
@@ -123,7 +123,6 @@ if(rating < 0 || rating > 5) {
     message : "Votre note doit être comprise en 0 et 5"
   });
 }
-
   Book.findOne({_id: req.params.id})
   .then(book => {
 //On vérifie si l'utilisateur a déjà noté
@@ -149,6 +148,13 @@ return book.save();
 .catch(error => res.status(400).json({error}));
 }
 
-// à faire > /api/books/bestrating 
-// à faire > tester chacune des exigences fonctionnelles
-// à faire > Sharp > Images optimisées
+//GET on récupère les 3 livres les mieux évalués
+exports.bestRating = (req, res, next) => {
+Book.find()
+.sort({averageRating: -1}) //tri décroissant
+.limit(3) //seulement les 3 premiers
+.then((books => res.status(200).json(books)))
+.catch((error) => res.status(400).json({error}))
+}
+
+// à faire > tester chacune des exigences fonctionnelles via Thunder
