@@ -20,8 +20,8 @@ if (typeof bookObject.ratings === 'string') {
  delete bookObject._id; 
 //On utilise le userId venant du token d'auth
 //Ainsi, personne ne peut utiliser le userId de quelqu'un d'autre
- delete bookObject._userId; 
-// Vérifie qu'une note est présente
+delete bookObject._userId; 
+
 if (!Array.isArray(bookObject.ratings) || bookObject.ratings.length === 0) {
   return res.status(400).json({
     message: "Vous devez obligatoirement attribuer une note au livre."
