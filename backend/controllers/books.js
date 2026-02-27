@@ -1,20 +1,41 @@
 const Book = require('../models/Book');
 const sharp = require('sharp');
 const path = require('path');
-//signifie « file system » (soit « système de fichiers », en français)
+//signifie « file system »
 //Il donne accès aux fonctions qui permettent de modifier le système de fichiers
 const fs = require('fs');
-//Bien revoir la section "Modifiez les routes prendre en compte les fichiers"
 
 exports.createBook = async (req, res, next) => {
 console.log(req.file);
 console.log(req.body);
-//const bookObject = JSON.parse(req.body.thing)
 const bookObject = req.body.book ? JSON.parse(req.body.book) : req.body;
-
- delete bookObject._id; //ID générée automatiquement par bdd donc delete
- delete bookObject._userId; //On utilise le userId venant du token d'auth
+if (typeof bookObject.ratings === 'string') {
+  try {
+    bookObject.ratings = JSON.parse(bookObject.ratings);
+  } catch {
+    bookObject.ratings = null;
+  }
+}
+//ID générée automatiquement par bdd donc delete
+ delete bookObject._id; 
+//On utilise le userId venant du token d'auth
 //Ainsi, personne ne peut utiliser le userId de quelqu'un d'autre
+ delete bookObject._userId; 
+// Vérifie qu'une note est présente
+if (!Array.isArray(bookObject.ratings) || bookObject.ratings.length === 0) {
+  return res.status(400).json({
+    message: "Vous devez obligatoirement attribuer une note au livre."
+  });
+}
+
+const rating = Number(bookObject.ratings[0].grade);
+
+//On vérifie que la note est entre 0 et 5
+if (rating < 0 || rating > 5) {
+  return res.status(400).json({
+    message: "La note doit être comprise entre 0 et 5."
+  });
+}
 
  try {
 
@@ -28,14 +49,14 @@ await sharp(req.file.buffer)
   .webp({ quality: 80 })
   .toFile(imagePath);
 
+//On génère nous-même l'URL via le nom de fichier donné par Sharp
 const book = new Book({
   ...bookObject,
   userId: req.auth.userId,
   imageUrl: `${req.protocol}://${req.get('host')}/images/${filename}`,
   ratings: bookObject.ratings,
   averageRating: bookObject.averageRating || 0
-  //On génère nous-même l'URL via le nom de fichier donné par Sharp
-});
+}); 
 
 await book.save();
 
@@ -46,13 +67,12 @@ res.status(201).json({message: 'Objet enregistré'});
 }
 };
 
-
-exports.modifyBook = (req, res, next) => {
 //PUT modifiant un objet existant //Méthode updateOne
+exports.modifyBook = (req, res, next) => {
 //Si l'utilisateur transmet un fichier, il est obtenu sous la forme d'un string
 //MAIS ce n'est pas le cas s'il n'en transmet pas : il faut donc gérer les 2 cas
  const bookObject = req.file ? {
-  ...JSON.parse(req.body.thing),
+  ...JSON.parse(req.body.book),
 //S'il n'y a pas d'objet transmis, on la récupère dans le corps de la requète
   imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
  } : {...req.body};
@@ -60,11 +80,11 @@ exports.modifyBook = (req, res, next) => {
 //Puis le modifie pour le réassigner à son nom
 delete bookObject._userId;
 Book.findOne({_id: req.params.id})
-.then((thing) => {
+.then((book) => {
 //Si le champ userId récupéré en base est différent de l'userId du token
 //C'est que quelqu'un essaie de modifie un objet qui ne lui appartient pas
-//On renvoie donc une erreur 400
-  if(thing.userId !== req.auth.userId ) {
+//On renvoie donc une erreur 403
+  if(book.userId !== req.auth.userId ) {
   return  res.status(403).json({message: "Non-autorisé"})
   } else {
 //Filtre indiquant quel est l'enregistrement à mettre à jour
@@ -97,7 +117,7 @@ exports.deleteBook =(req, res, next) => {
 Book.findOne({_id: req.params.id})
 .then(book => {
 if(book.userId !== req.auth.userId) {
-  return res.status(401).json({message: 'Non-autorisé'})
+  return res.status(403).json({message: 'Non-autorisé'})
 } else {
 //On récupère le nom de fichier via un split du repertoire images
   const fileName = book.imageUrl.split('/images/')[1];
@@ -117,7 +137,7 @@ Book.deleteOne({_id: req.params.id})
 //POST de notation des livres
 exports.rateBook = (req, res, next) => {
   const userId = req.auth.userId;
-  const rating = req.body.rating;
+  const rating = Number(req.body.rating);
 if(rating < 0 || rating > 5) {
   return res.status(400).json({
     message : "Votre note doit être comprise en 0 et 5"
@@ -140,8 +160,8 @@ if(rating < 0 || rating > 5) {
 const total = book.ratings.reduce(
   (sum, rating) => sum + rating.grade, 0
 );
-//On divise le total par le nombre de notes uniques
-book.averageRating = total/book.ratings.length
+//On divise le total par le nombre de notes uniques, en gardant une note à décimale
+book.averageRating = Math.round((total / book.ratings.length) * 10) / 10;
 return book.save();
   })
 .then(updateBook => res.status(200).json(updateBook))
@@ -156,5 +176,3 @@ Book.find()
 .then((books => res.status(200).json(books)))
 .catch((error) => res.status(400).json({error}))
 }
-
-// à faire > tester chacune des exigences fonctionnelles via Thunder

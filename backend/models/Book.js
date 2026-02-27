@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-//fonction schema, mise à disposition par mongoose
+//Méthode schema, mise à disposition par mongoose
 //permet de passer un objet
 const bookSchema = mongoose.Schema({
     userId: {type : String, required: true},
@@ -9,16 +9,21 @@ const bookSchema = mongoose.Schema({
     imageUrl: {type: String, required: true},
     year: {type: Number, required: true},
     genre: {type: String, required: true},
-    ratings: [
-        {
-            userId : {type: String, required: true},
-            grade: {type: Number, required: true}
-        }
-    ],
-    averageRating: {type: Number}
+    ratings: {
+  type: [
+    {
+      userId: { type: String, required: true },
+      grade: { type: Number, required: true }
+    }
+  ],
+  required: true,
+  validate: [
+    val => val.length > 0,
+    'Un livre doit contenir au moins une note.'
+  ]
+},
+  averageRating: {type: Number}
 })
-
-//Note : retiré le required de averageRating, à voir si cela ne cause pas de bug
 
 
 //Seconde méthode du package mongoose : mongoose.Model
