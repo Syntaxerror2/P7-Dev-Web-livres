@@ -11,16 +11,15 @@ const userRoute = require('./routes/user')
 
 
 //Travail effectué depuis une BDD en dur, faute d'autre possibilité
-//J'annote celle-ci et ajoute ci-dessous l'URL de la BDD exportée en ligne
-mongoose.connect('mongodb+srv://syntaxerror:1234@cluster0.28mlqmf.mongodb.net/?appName=Cluster0')
-.then(() => console.log('Connexion à MongoDB réussie !'))
-.catch(err => console.error(err));
-
 /* 
 mongoose.connect('mongodb://127.0.0.1:27017/livres')
   .then(() => console.log('Connexion MongoDB locale réussie !'))
   .catch(err => console.error(err));
 */
+//Je commente celle-ci et ajoute ci-dessous l'URL de la BDD exportée en ligne
+mongoose.connect('mongodb+srv://syntaxerror:1234@cluster0.28mlqmf.mongodb.net/?appName=Cluster0')
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch(err => console.error(err));
 
 const app = express();
 
