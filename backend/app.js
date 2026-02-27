@@ -1,8 +1,11 @@
+//Framework Node pour créer une API REST
 const express = require('express');
+//Mongoose permet d'interagir avec MongoDB via des schémas
 const mongoose = require('mongoose');
+//Module Node pour gérer les chemins des fichiers
 const path = require('path');
 
-//On importe leS routers
+//On importe les routers
 const booksRoute = require('./routes/books')
 const userRoute = require('./routes/user')
 
@@ -20,11 +23,14 @@ mongoose.connect('mongodb://127.0.0.1:27017/livres')
 
 const app = express();
 
+//Middleware permettant de parser le JSON des requêtes
 app.use(express.json());
 
+// Rend le dossier "images" accessible publiquement
+// Permet d'accéder aux images via une URL
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
-//Headers
+//Midleware CORS
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -32,7 +38,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// Définition des routes principales
+// Toutes les routes livres commenceront par /api/books
 app.use('/api/books', booksRoute);
+
+// Toutes les routes d’authentification commenceront par /api/auth
 app.use('/api/auth', userRoute)
 
+//Export de l'app pour être utlisée dans server.js
 module.exports = app;

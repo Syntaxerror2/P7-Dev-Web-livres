@@ -30,12 +30,21 @@ if (!Array.isArray(bookObject.ratings) || bookObject.ratings.length === 0) {
 
 const rating = Number(bookObject.ratings[0].grade);
 
-//On vérifie que la note est entre 0 et 5
+//On vérifie que la note est comprise entre 0 et 5
 if (rating < 0 || rating > 5) {
   return res.status(400).json({
     message: "La note doit être comprise entre 0 et 5."
   });
 }
+
+//On sécurise le userId dans ratings
+bookObject.ratings = [{
+  userId: req.auth.userId,
+  grade: rating
+}];
+
+//On calcule la moyenne à la création
+bookObject.averageRating = rating;
 
  try {
 
@@ -59,9 +68,7 @@ const book = new Book({
 }); 
 
 await book.save();
-
 res.status(201).json({message: 'Objet enregistré'});
-
 } catch(error) {
   res.status(400).json({error});
 }
@@ -100,12 +107,18 @@ Book.findOne({_id: req.params.id})
 })
 };
 
+//On récupère un seul livre à partir de son id (req.params.id)
+//Utilise Book.findOne()
+//Retourne 200 avec le livre ou 404 s’il n’existe pas
 exports.findOneBook = (req, res, next) => {
   Book.findOne({ _id: req.params.id })
     .then(book => res.status(200).json(book))
     .catch(error => res.status(404).json({ error }));
 };
 
+//On récupère un seul livre à partir de son id (req.params.id)
+//Utilise Book.findOne()
+//On Retourne 200 avec le livre ou 404 s’il n’existe pas
 exports.findBook = (req, res, next) => {
  Book.find()
  .then(books => res.status(200).json(books))
@@ -171,8 +184,10 @@ return book.save();
 //GET on récupère les 3 livres les mieux évalués
 exports.bestRating = (req, res, next) => {
 Book.find()
-.sort({averageRating: -1}) //tri décroissant
-.limit(3) //seulement les 3 premiers
+//tri décroissant
+.sort({averageRating: -1}) 
+//seulement les 3 premiers
+.limit(3) 
 .then((books => res.status(200).json(books)))
 .catch((error) => res.status(400).json({error}))
 }
