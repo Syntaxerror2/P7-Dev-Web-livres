@@ -1,6 +1,8 @@
 //Framework Node pour créer une API REST
+//Gestion des routes
 const express = require('express');
 //Mongoose permet d'interagir avec MongoDB via des schémas
+//Connexion/structuration MongoDB
 const mongoose = require('mongoose');
 //Module Node pour gérer les chemins des fichiers
 const path = require('path');
@@ -11,19 +13,24 @@ const userRoute = require('./routes/user')
 
 
 //Travail effectué depuis une BDD en dur, faute d'autre possibilité
-/* 
+
+
 mongoose.connect('mongodb://127.0.0.1:27017/livres')
   .then(() => console.log('Connexion MongoDB locale réussie !'))
   .catch(err => console.error(err));
-*/
+
+/* 
 //Je commente celle-ci et ajoute ci-dessous l'URL de la BDD exportée en ligne
 mongoose.connect('mongodb+srv://syntaxerror:1234@cluster0.28mlqmf.mongodb.net/?appName=Cluster0')
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(err => console.error(err));
+*/
+
 
 const app = express();
 
 //Middleware permettant de parser le JSON des requêtes
+//Lecture du body
 app.use(express.json());
 
 // Rend le dossier "images" accessible publiquement

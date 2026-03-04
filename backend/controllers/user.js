@@ -6,6 +6,14 @@ const jwt = require('jsonwebtoken');
 
 exports.signup = (req, res, next) => {
 
+// Regex simple pour vérifier le format de l'email
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(req.body.email)) {
+  return res.status(400).json({
+    message: "Veuillez saisir une adresse email valide"
+  });
+}
 
 //On passe à bcrypt le mdp du corps de la requète/le nombre de tour de l'algo 
 //de hachage (cryptage)
@@ -37,13 +45,13 @@ exports.login = (req, res, next) => {
             } else {
                 res.status(200).json({
                     userId: user._id,
+//On appelle la fonction sign() de jwt
+//arguments : payload, clé d'encodage, délai avant expiration
                     token: jwt.sign(
                     {userId: user._id},
                     'RANDOM_TOKEN_SECRET',
                     {expiresIn: '24h'}
                     )
-//On appelle la fonction sign() de jwt
-//arguments : payload, clé d'encodage, délai avant expiration
                 })
             }
         })

@@ -1,13 +1,15 @@
+//Controller, logique métier propre à l'application
 const Book = require('../models/Book');
 const sharp = require('sharp');
 const path = require('path');
 //signifie « file system »
 //Il donne accès aux fonctions qui permettent de modifier le système de fichiers
 const fs = require('fs');
-
 exports.createBook = async (req, res, next) => {
 console.log(req.file);
 console.log(req.body);
+//On utilise l’opérateur ternaire pour récupérer les données du livre envoyées dans la requête.
+//Si on obtient les données on les parse, autrement on utilise directement le body
 const bookObject = req.body.book ? JSON.parse(req.body.book) : req.body;
 if (typeof bookObject.ratings === 'string') {
   try {
@@ -17,7 +19,7 @@ if (typeof bookObject.ratings === 'string') {
   }
 }
 //ID générée automatiquement par bdd donc delete
- delete bookObject._id; 
+delete bookObject._id; 
 //On utilise le userId venant du token d'auth
 //Ainsi, personne ne peut utiliser le userId de quelqu'un d'autre
 delete bookObject._userId; 

@@ -12,6 +12,8 @@ router.post('/', auth, multer, bookCtrl.createBook);
 //POST Afin de vérifier les images
 router.post('/:id/rating', auth, bookCtrl.rateBook);
 
+//Important de placer les routes spécifiques avant les routes dynamiques (comme id)
+
 //PUT modifiant un objet existant, Méthode updateOne
 router.put('/:id', auth, bookCtrl.modifyBook);
 
@@ -20,6 +22,10 @@ router.get('/bestrating', bookCtrl.bestRating)
 
 //GET d'un seul Book //Méthode findOne
 router.get('/:id', bookCtrl.findOneBook);
+
+//Express teste /bestrating
+//Si ça ne correspond pas, il teste /:id
+// La route spécifique est prioritaire
   
 //GET des Book enregistrés //Méthode find
 router.get('/', bookCtrl.findBook);
